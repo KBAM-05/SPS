@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학교 하원 관리 시스템</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+          theme: {
+              extend: {
+                  colors: {
+                      primary: {
+                          DEFAULT: '#3b82f6',
+                          foreground: '#ffffff'
+                      },
+                      secondary: {
+                          DEFAULT: '#f1f5f9',
+                          foreground: '#0f172a'
+                      },
+                      muted: {
+                          DEFAULT: '#f1f5f9',
+                          foreground: '#64748b'
+                      },
+                      destructive: {
+                          DEFAULT: '#ef4444',
+                          foreground: '#ffffff'
+                      },
+                      border: '#e2e8f0',
+                      input: '#e2e8f0',
+                      ring: '#3b82f6'
+                  }
+              }
+          }
+      }
+  </script>
+  <style>
+      .hidden { display: none; }
+      .animate-bounce {
+          animation: bounce 1s infinite;
+      }
+      @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+              transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+              transform: translate3d(0,-30px,0);
+          }
+          70% {
+              transform: translate3d(0,-15px,0);
+          }
+          90% {
+              transform: translate3d(0,-4px,0);
+          }
+      }
+      .notification {
+          position: fixed;
+          bottom: 1rem;
+          right: 1rem;
+          z-index: 50;
+          max-width: 24rem;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.5rem;
+          padding: 1rem;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .notification-persistent {
+          animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+          0%, 100% {
+              opacity: 1;
+          }
+          50% {
+              opacity: 0.8;
+          }
+      }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 메인 페이지 -->
+  <div id="main-page" class="min-h-screen flex flex-col">
+      <header class="bg-primary py-4">
+          <div class="container mx-auto px-4">
+              <h1 class="text-2xl font-bold text-white">학교 하원 관리 시스템</h1>
+          </div>
+      </header>
+      <main class="flex-1">
+          <div class="container mx-auto flex flex-col items-center justify-center px-4 py-16">
+              <div class="mb-8 text-center">
+                  <h2 class="mb-2 text-3xl font-bold">안전한 하원 관리를 위한 솔루션</h2>
+                  <p class="text-muted-foreground">
+                      학교와 학부모 간의 원활한 소통으로 아이들의 하원 과정을 체계적으로 관리합니다.
+                  </p>
+              </div>
+              <div class="grid w-full max-w-md gap-4">
+                  <button onclick="showPage('parent-login')" class="w-full bg-primary text-white py-3 px-6 rounded-md hover:bg-blue-600 transition-colors">
+                      학부모 계정으로 로그인
+                  </button>
+                  <button onclick="showPage('parent-register')" class="w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 transition-colors">
+                      학부모 계정 가입하기
+                  </button>
+              </div>
+          </div>
+      </main>
+      <footer class="border-t py-6">
+          <div class="container mx-auto px-4 text-center">
+              <div class="mb-4 flex justify-center space-x-4">
+                  <button onclick="showPage('school-login')" class="text-primary hover:underline text-sm">
+                      학교 계정 로그인
+                  </button>
+                  <button onclick="showPage('school-register')" class="text-primary hover:underline text-sm">
+                      학교 계정 등록
+                  </button>
+              </div>
+              <div class="text-sm text-muted-foreground">
+                  &copy; 2024 학교 하원 관리 시스템. All rights reserved.
+              </div>
+          </div>
+      </footer>
+  </div>
+
+  <!-- 학부모 로그인 페이지 -->
+  <div id="parent-login" class="hidden min-h-screen flex items-center justify-center">
+      <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+          <div class="mb-6">
+              <h2 class="text-2xl font-bold mb-2">학부모 계정 로그인</h2>
+              <p class="text-muted-foreground">학부모 계정으로 로그인하세요</p>
+          </div>
+          <form onsubmit="parentLogin(event)">
+              <div class="space-y-4">
+                  <div>
+                      <label class="block text-sm font-medium mb-2">아이디</label>
+                      <input type="text" id="parent-username-login" class="w-full px-3 py-2 border border-input rounded-md" required>
+                  </div>
+                  <div>
+                      <label class="block text-sm font-medium mb-2">비밀번호</label>
+                      <input type="password" id="parent-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                  </div>
+              </div>
+              <div class="mt-6 space-y-4">
+                  <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                      로그인
+                  </button>
+                  <div class="text-center text-sm">
+                      계정이 없으신가요? 
+                      <button type="button" onclick="showPage('parent-register')" class="text-primary hover:underline">회원가입</button>
+                  </div>
+                  <button type="button" onclick="showPage('main-page')" class="w-full text-gray-600 hover:text-gray-800">
+                      메인으로 돌아가기
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- 학부모 회원가입 페이지 -->
+  <div id="parent-register" class="hidden min-h-screen py-8">
+      <div class="container mx-auto px-4">
+          <div class="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+              <div class="mb-6">
+                  <h2 class="text-2xl font-bold mb-2">학부모 계정 가입</h2>
+                  <p class="text-muted-foreground">아이의 하원 관리를 위한 계정을 만드세요</p>
+              </div>
+              <form onsubmit="parentRegister(event)">
+                  <div class="space-y-6">
+                      <!-- 학교 정보 -->
+                      <div>
+                          <h3 class="text-lg font-medium mb-4">학교 정보</h3>
+                          <div>
+                              <label class="block text-sm font-medium mb-2">학교 코드</label>
+                              <input type="text" id="school-code" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              <p class="text-xs text-muted-foreground mt-1">
+                                  학교에서 제공받은 코드를 입력하세요.
+                              </p>
+                              <div id="school-code-status" class="mt-1 text-xs"></div>
+                          </div>
+                      </div>
+
+                      <!-- 보호자 정보 -->
+                      <div>
+                          <h3 class="text-lg font-medium mb-4">보호자 정보</h3>
+                          <div class="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">이름</label>
+                                  <input type="text" id="parent-name" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">연락처</label>
+                                  <input type="tel" id="parent-phone" placeholder="010-0000-0000" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                          </div>
+                          <div class="mt-4">
+                              <label class="block text-sm font-medium mb-2">아이디</label>
+                              <input type="text" id="parent-username" class="w-full px-3 py-2 border border-input rounded-md" placeholder="로그인에 사용할 아이디" required>
+                              <p class="text-xs text-muted-foreground mt-1">로그인 시 사용할 아이디를 입력하세요.</p>
+                          </div>
+                          <div class="mt-4">
+                              <label class="block text-sm font-medium mb-2">이메일</label>
+                              <input type="email" id="parent-reg-email" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              <p class="text-xs text-muted-foreground mt-1">비밀번호 찾기 등에 사용됩니다.</p>
+                          </div>
+                          <div class="grid gap-4 sm:grid-cols-2 mt-4">
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">비밀번호</label>
+                                  <input type="password" id="parent-reg-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">비밀번호 확인</label>
+                                  <input type="password" id="parent-confirm-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- 아이 정보 -->
+                      <div>
+                          <h3 class="text-lg font-medium mb-4">아이 정보</h3>
+                          <div class="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">아이 이름</label>
+                                  <input type="text" id="child-name" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">반</label>
+                                  <select id="child-class" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                      <option value="">반 선택</option>
+                                      <option value="돌봄1반">돌봄 1반</option>
+                                      <option value="돌봄2반">돌봄 2반</option>
+                                      <option value="돌봄3반">돌봄 3반</option>
+                                  </select>
+                              </div>
+                          </div>
+                      </div>
+
+                      <!-- 약관 동의 -->
+                      <div class="flex items-center space-x-2">
+                          <input type="checkbox" id="agree-terms" required>
+                          <label for="agree-terms" class="text-sm">개인정보 수집 및 이용에 동의합니다</label>
+                      </div>
+                  </div>
+
+                  <div class="mt-6 space-y-4">
+                      <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                          가입하기
+                      </button>
+                      <div class="text-center text-sm">
+                          이미 계정이 있으신가요? 
+                          <button type="button" onclick="showPage('parent-login')" class="text-primary hover:underline">로그인</button>
+                      </div>
+                      <button type="button" onclick="showPage('main-page')" class="w-full text-gray-600 hover:text-gray-800">
+                          메인으로 돌아가기
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+
+  <!-- 학교 계정 로그인 페이지 -->
+  <div id="school-login" class="hidden min-h-screen flex items-center justify-center">
+      <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+          <div class="mb-6">
+              <h2 class="text-2xl font-bold mb-2">학교 계정 로그인</h2>
+              <p class="text-muted-foreground">학교 계정으로 로그인하세요</p>
+          </div>
+          <form onsubmit="schoolLogin(event)">
+              <div class="space-y-4">
+                  <div>
+                      <label class="block text-sm font-medium mb-2">아이디</label>
+                      <input type="text" id="school-username" class="w-full px-3 py-2 border border-input rounded-md" required>
+                  </div>
+                  <div>
+                      <label class="block text-sm font-medium mb-2">비밀번호</label>
+                      <input type="password" id="school-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                  </div>
+              </div>
+              <div class="mt-6 space-y-4">
+                  <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                      로그인
+                  </button>
+                  <div class="text-center text-sm">
+                      학교 계정이 없으신가요? 
+                      <button type="button" onclick="showPage('school-register')" class="text-primary hover:underline">학교 계정 등록하기</button>
+                  </div>
+                  <button type="button" onclick="showPage('main-page')" class="w-full text-gray-600 hover:text-gray-800">
+                      메인으로 돌아가기
+                  </button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- 학교 계정 등록 페이지 -->
+  <div id="school-register" class="hidden min-h-screen py-8">
+      <div class="container mx-auto px-4">
+          <div class="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+              <div class="mb-6">
+                  <h2 class="text-2xl font-bold mb-2">학교 계정 등록</h2>
+                  <p class="text-muted-foreground">학교 정보와 계정 정보를 입력하여 등록하세요</p>
+              </div>
+              <form onsubmit="schoolRegister(event)">
+                  <div class="space-y-6">
+                      <!-- 학교 정보 -->
+                      <div>
+                          <h3 class="text-lg font-medium mb-4">학교 정보</h3>
+                          <div class="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">학교명</label>
+                                  <input type="text" id="school-name" class="w-full px-3 py-2 border border-input rounded-md" required>
+                              </div>
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">학교 코드</label>
+                                  <input type="text" id="school-reg-code" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  <p class="text-xs text-muted-foreground mt-1">
+                                      학부모가 가입 시 사용할 고유 코드입니다. 영문과 숫자 조합을 권장합니다.
+                                  </p>
+                              </div>
+                          </div>
+                          <div class="mt-4">
+                              <label class="block text-sm font-medium mb-2">주소</label>
+                              <textarea id="school-address" class="w-full px-3 py-2 border border-input rounded-md" rows="3" required></textarea>
+                          </div>
+                          <div class="mt-4">
+                              <label class="block text-sm font-medium mb-2">대표 전화번호</label>
+                              <input type="tel" id="school-phone" placeholder="02-0000-0000" class="w-full px-3 py-2 border border-input rounded-md" required>
+                          </div>
+                      </div>
+
+                      <!-- 계정 정보 -->
+                      <div>
+                          <h3 class="text-lg font-medium mb-4">계정 정보</h3>
+                          <div class="space-y-4">
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">아이디</label>
+                                  <input type="text" id="school-reg-username" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  <p class="text-xs text-muted-foreground mt-1">로그인에 사용할 아이디를 입력하세요.</p>
+                              </div>
+                              <div>
+                                  <label class="block text-sm font-medium mb-2">이메일</label>
+                                  <input type="email" id="school-email" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  <p class="text-xs text-muted-foreground mt-1">비밀번호 찾기 등에 사용됩니다.</p>
+                              </div>
+                              <div class="grid gap-4 sm:grid-cols-2">
+                                  <div>
+                                      <label class="block text-sm font-medium mb-2">비밀번호</label>
+                                      <input type="password" id="school-reg-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  </div>
+                                  <div>
+                                      <label class="block text-sm font-medium mb-2">비밀번호 확인</label>
+                                      <input type="password" id="school-confirm-password" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="mt-6 space-y-4">
+                      <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                          학교 계정 등록하기
+                      </button>
+                      <div class="text-center text-sm">
+                          이미 계정이 있으신가요? 
+                          <button type="button" onclick="showPage('school-login')" class="text-primary hover:underline">학교 계정 로그인</button>
+                      </div>
+                      <button type="button" onclick="showPage('main-page')" class="w-full text-gray-600 hover:text-gray-800">
+                          메인으로 돌아가기
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+
+  <!-- 학부모 대시보드 -->
+  <div id="parent-dashboard" class="hidden min-h-screen flex flex-col">
+      <header class="bg-primary text-white p-4">
+          <div class="container mx-auto flex justify-between items-center">
+              <div>
+                  <h1 class="text-xl font-bold">학부모 하원 관리</h1>
+                  <p class="text-sm opacity-90" id="parent-welcome"></p>
+              </div>
+              <button onclick="logout()" class="text-white hover:text-gray-200">로그아웃</button>
+          </div>
+      </header>
+      <main class="flex-1 p-4 md:p-6">
+          <div class="grid gap-6 md:grid-cols-2">
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h2 class="text-xl font-bold mb-4">하원 요청</h2>
+                  <p class="text-muted-foreground mb-4">아이의 하원을 요청하세요</p>
+                  
+                  <div id="pickup-success" class="hidden text-center py-6">
+                      <div class="text-green-500 text-6xl mb-2">✓</div>
+                      <h3 class="text-xl font-medium">하원 요청이 완료되었습니다</h3>
+                      <p class="text-muted-foreground">학교에서 요청을 확인하고 아이를 준비시킬 것입니다.</p>
+                  </div>
+
+                  <form id="pickup-form" onsubmit="submitPickupRequest(event)">
+                      <div class="space-y-4">
+                          <div>
+                              <label class="block text-sm font-medium mb-2">아이 선택</label>
+                              <select id="pickup-child" class="w-full px-3 py-2 border border-input rounded-md" required>
+                                  <option value="">아이를 선택하세요</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label class="block text-sm font-medium mb-2">메모 (선택사항)</label>
+                              <textarea id="pickup-note" placeholder="특이사항이 있으면 입력하세요 (예: 할머니가 데리러 갑니다)" class="w-full px-3 py-2 border border-input rounded-md" rows="3"></textarea>
+                          </div>
+                      </div>
+                      <button type="submit" class="w-full mt-4 bg-primary text-white py-3 px-4 rounded-md hover:bg-blue-600 text-lg font-medium">
+                          하원 요청하기
+                      </button>
+                  </form>
+              </div>
+
+              <div class="space-y-6">
+                  <div class="bg-white rounded-lg shadow-md p-6">
+                      <h3 class="text-lg font-bold mb-4">아이 정보</h3>
+                      <div id="child-info" class="space-y-2">
+                          <!-- 동적으로 채워짐 -->
+                      </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg shadow-md p-6">
+                      <h3 class="text-lg font-bold mb-4">학교 정보</h3>
+                      <div id="school-info" class="space-y-2">
+                          <!-- 동적으로 채워짐 -->
+                      </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg shadow-md p-6">
+                      <h3 class="text-lg font-bold mb-4">최근 하원 기록</h3>
+                      <div id="pickup-history" class="space-y-4">
+                          <div class="text-center text-muted-foreground py-4">
+                              아직 하원 기록이 없습니다.
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+  </div>
+
+  <!-- 학교 대시보드 -->
+  <div id="school-dashboard" class="hidden min-h-screen flex flex-col">
+      <header class="bg-primary text-white p-4">
+          <div class="container mx-auto flex justify-between items-center">
+              <div>
+                  <h1 class="text-xl font-bold">학교 하원 관리</h1>
+                  <p class="text-sm opacity-90" id="school-welcome"></p>
+              </div>
+              <div class="flex items-center space-x-4">
+                  <div class="relative">
+                      <span class="text-white">🔔</span>
+                      <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                  </div>
+                  <button onclick="showPage('school-parents')" class="text-white hover:text-gray-200 flex items-center space-x-1">
+                      <span>👥</span>
+                      <span class="text-sm">학부모 관리</span>
+                  </button>
+                  <button onclick="logout()" class="text-white hover:text-gray-200">로그아웃</button>
+              </div>
+          </div>
+      </header>
+      <main class="flex-1 p-4 md:p-6">
+          <div class="grid gap-4 md:grid-cols-3 mb-6">
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">현재 학교에 있는 학생</h3>
+                  <p class="text-muted-foreground text-sm">돌봄교실 학생 현황</p>
+                  <div class="text-3xl font-bold mt-2" id="present-count">0명</div>
+              </div>
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">하원 대기 중</h3>
+                  <p class="text-muted-foreground text-sm">하원 요청이 접수된 학생</p>
+                  <div class="text-3xl font-bold text-amber-500 mt-2" id="pending-count">0명</div>
+              </div>
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">하원 완료</h3>
+                  <p class="text-muted-foreground text-sm">오늘 하원한 학생</p>
+                  <div class="text-3xl font-bold text-green-500 mt-2" id="picked-count">0명</div>
+              </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md">
+              <div class="border-b">
+                  <div class="flex">
+                      <button onclick="showTab('students')" id="students-tab" class="px-4 py-2 border-b-2 border-primary text-primary font-medium">
+                          학생 목록
+                      </button>
+                      <button onclick="showTab('notifications')" id="notifications-tab" class="px-4 py-2 text-gray-500 hover:text-gray-700">
+                          하원 요청
+                          <span id="notification-count" class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">0</span>
+                      </button>
+                  </div>
+              </div>
+
+              <div id="students-content" class="p-6">
+                  <div class="flex justify-between items-center mb-4">
+                      <h3 class="text-lg font-bold">학생 목록</h3>
+                      <div class="flex space-x-2">
+                          <button onclick="filterStudents('all')" id="filter-all" class="px-3 py-1 bg-primary text-white rounded text-sm">전체</button>
+                          <button onclick="filterStudents('돌봄1반')" id="filter-1" class="px-3 py-1 border rounded text-sm">돌봄1반</button>
+                          <button onclick="filterStudents('돌봄2반')" id="filter-2" class="px-3 py-1 border rounded text-sm">돌봄2반</button>
+                          <button onclick="filterStudents('돌봄3반')" id="filter-3" class="px-3 py-1 border rounded text-sm">돌봄3반</button>
+                      </div>
+                  </div>
+                  <div class="overflow-x-auto">
+                      <table class="w-full">
+                          <thead>
+                              <tr class="border-b">
+                                  <th class="text-left py-2">이름</th>
+                                  <th class="text-left py-2">반</th>
+                                  <th class="text-left py-2">상태</th>
+                                  <th class="text-left py-2">보호자</th>
+                                  <th class="text-left py-2">연락처</th>
+                                  <th class="text-right py-2">관리</th>
+                              </tr>
+                          </thead>
+                          <tbody id="students-table">
+                              <tr>
+                                  <td colspan="6" class="py-8 text-center text-muted-foreground">
+                                      등록된 학생이 없습니다.<br>
+                                      학부모가 계정을 등록하면 학생 목록이 표시됩니다.
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+
+              <div id="notifications-content" class="hidden p-6">
+                  <h3 class="text-lg font-bold mb-4">하원 요청 목록</h3>
+                  <p class="text-muted-foreground mb-4">학부모로부터 접수된 하원 요청을 확인하세요</p>
+                  <div id="pickup-requests">
+                      <div class="py-8 text-center text-muted-foreground">
+                          접수된 하원 요청이 없습니다.
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+  </div>
+
+  <!-- 학부모 관리 페이지 -->
+  <div id="school-parents" class="hidden min-h-screen flex flex-col">
+      <header class="bg-primary text-white p-4">
+          <div class="container mx-auto flex justify-between items-center">
+              <div>
+                  <h1 class="text-xl font-bold">학부모 관리</h1>
+                  <p class="text-sm opacity-90">등록된 학부모와 아이 정보를 관리하세요</p>
+              </div>
+              <div class="flex items-center space-x-4">
+                  <div class="relative">
+                      <span class="text-white">🔔</span>
+                      <span id="parents-notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                  </div>
+                  <button onclick="showPage('school-dashboard')" class="text-white hover:text-gray-200">대시보드</button>
+                  <button onclick="logout()" class="text-white hover:text-gray-200">로그아웃</button>
+              </div>
+          </div>
+      </header>
+      <main class="flex-1 p-4 md:p-6">
+          <!-- 통계 카드 -->
+          <div class="grid gap-4 md:grid-cols-3 mb-6">
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">총 학부모 수</h3>
+                  <div class="text-3xl font-bold" id="total-parents">0명</div>
+              </div>
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">총 학생 수</h3>
+                  <div class="text-3xl font-bold" id="total-students">0명</div>
+              </div>
+              <div class="bg-white rounded-lg shadow-md p-6">
+                  <h3 class="font-bold mb-2">반별 분포</h3>
+                  <div class="text-sm space-y-1" id="class-distribution">
+                      <!-- 동적으로 채워짐 -->
+                  </div>
+              </div>
+          </div>
+
+          <!-- 검색 및 학부모 목록 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+              <div class="mb-4">
+                  <h3 class="text-lg font-bold mb-2">학부모 목록</h3>
+                  <p class="text-muted-foreground mb-4">학부모 정보를 검색하고 관리하세요</p>
+                  
+                  <div class="flex items-center space-x-2 mb-4">
+                      <div class="relative flex-1">
+                          <span class="absolute left-2 top-2.5 text-muted-foreground">🔍</span>
+                          <input 
+                              type="text" 
+                              id="parent-search" 
+                              placeholder="학부모명, 이메일, 연락처, 아이 이름으로 검색..." 
+                              class="w-full pl-8 px-3 py-2 border border-input rounded-md"
+                              oninput="searchParents()"
+                          >
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 학부모 목록 테이블 -->
+              <div class="overflow-x-auto">
+                  <table class="w-full">
+                      <thead>
+                          <tr class="border-b">
+                              <th class="text-left py-2">학부모명</th>
+                              <th class="text-left py-2">연락처</th>
+                              <th class="text-left py-2">이메일</th>
+                              <th class="text-left py-2">아이 정보</th>
+                              <th class="text-left py-2">가입일</th>
+                              <th class="text-right py-2">관리</th>
+                          </tr>
+                      </thead>
+                      <tbody id="parents-table">
+                          <tr>
+                              <td colspan="6" class="py-8 text-center text-muted-foreground">
+                                  등록된 학부모가 없습니다.
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </main>
+  </div>
+
+  <!-- 학부모 상세 정보 모달 -->
+  <div id="parent-detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="p-6">
+              <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-xl font-bold">학부모 상세 정보</h2>
+                  <button onclick="closeParentModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              
+              <div id="parent-detail-content" class="space-y-6">
+                  <!-- 동적으로 채워짐 -->
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- 실시간 알림 팝업 -->
+  <div id="pickup-notification" class="hidden notification notification-persistent">
+      <div class="flex items-start gap-4">
+          <div class="bg-red-100 p-2 rounded-full">
+              <span class="text-red-500 text-xl">🔔</span>
+          </div>
+          <div class="flex-1">
+              <div class="flex justify-between items-center mb-1">
+                  <h3 class="font-semibold text-red-600">🚨 새로운 하원 요청</h3>
+                  <button onclick="closeNotification()" class="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              <p class="font-medium" id="notification-student"></p>
+              <p class="text-sm text-muted-foreground" id="notification-details"></p>
+              <p class="text-sm text-muted-foreground" id="notification-parent"></p>
+              <p class="mt-1 text-sm" id="notification-note"></p>
+              <div class="mt-3 flex justify-end gap-2">
+                  <button onclick="acknowledgeNotification()" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-600">확인</button>
+                  <button onclick="processNotificationPickup()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">하원 처리</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      // 데이터 저장소 - localStorage는 전역 데이터용, sessionStorage는 세션용
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      let schools = JSON.parse(localStorage.getItem('schools') || '[]');
+      let currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+      let pickupRequests = JSON.parse(localStorage.getItem('pickupRequests') || '[]');
+      let currentNotification = null;
+      let notificationInterval = null;
+
+      // 페이지 전환 함수
+      function showPage(pageId) {
+          const pages = ['main-page', 'parent-login', 'parent-register', 'school-login', 'school-register', 'parent-dashboard', 'school-dashboard', 'school-parents'];
+          pages.forEach(page => {
+              document.getElementById(page).classList.add('hidden');
+          });
+          document.getElementById(pageId).classList.remove('hidden');
+          
+          // 학부모 관리 페이지로 이동할 때 데이터 로드
+          if (pageId === 'school-parents') {
+              loadParentsPage();
+              startParentsPageUpdates();
+          } else if (pageId === 'school-dashboard') {
+              loadSchoolDashboard();
+          }
+      }
+
+      // 실시간 업데이트 시작 (학부모 관리 페이지용)
+      function startParentsPageUpdates() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          // 기존 인터벌 정리
+          if (notificationInterval) {
+              clearInterval(notificationInterval);
+          }
+
+          // 실시간 업데이트
+          notificationInterval = setInterval(() => {
+              loadParentsPage();
+              checkForNewNotifications();
+              updateParentsPageNotificationBadge();
+          }, 2000);
+
+          // localStorage 변경 감지
+          window.addEventListener('storage', handleStorageChange);
+      }
+
+      // localStorage 변경 감지 함수
+      function handleStorageChange(e) {
+          if (e.key === 'pickupRequests' || e.key === 'users') {
+              const currentPage = getCurrentPage();
+              if (currentPage === 'school-dashboard') {
+                  loadPickupRequests();
+                  updateCounts();
+                  checkForNewNotifications();
+              } else if (currentPage === 'school-parents') {
+                  loadParentsPage();
+                  updateParentsPageNotificationBadge();
+              }
+          }
+      }
+
+      // 현재 페이지 확인
+      function getCurrentPage() {
+          const pages = ['school-dashboard', 'school-parents', 'parent-dashboard'];
+          for (let page of pages) {
+              if (!document.getElementById(page).classList.contains('hidden')) {
+                  return page;
+              }
+          }
+          return null;
+      }
+
+      // 학부모 관리 페이지 알림 배지 업데이트
+      function updateParentsPageNotificationBadge() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const requests = pickupRequests.filter(req => {
+              const parentUser = users.find(u => u.id === req.parentId);
+              return parentUser && parentUser.schoolId === currentUser.id && req.status === 'pending';
+          });
+
+          const badge = document.getElementById('parents-notification-badge');
+          if (badge) {
+              if (requests.length > 0) {
+                  badge.textContent = requests.length.toString();
+                  badge.classList.remove('hidden');
+              } else {
+                  badge.classList.add('hidden');
+              }
+          }
+      }
+
+      // 새로운 알림 확인 및 표시
+      function checkForNewNotifications() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const requests = pickupRequests.filter(req => {
+              const parentUser = users.find(u => u.id === req.parentId);
+              return parentUser && parentUser.schoolId === currentUser.id && req.status === 'pending';
+          });
+
+          if (requests.length > 0) {
+              const latestRequest = requests[requests.length - 1];
+              showNotificationPopup(latestRequest);
+          } else {
+              hideNotificationPopup();
+          }
+      }
+
+      // 알림 팝업 표시
+      function showNotificationPopup(request) {
+          currentNotification = request;
+          const popup = document.getElementById('pickup-notification');
+          
+          document.getElementById('notification-student').textContent = `${request.childName} (${request.childClass})`;
+          document.getElementById('notification-details').textContent = `요청 시간: ${request.requestTime}`;
+          document.getElementById('notification-parent').textContent = `요청자: ${request.parentName}`;
+          document.getElementById('notification-note').textContent = request.note ? `메모: ${request.note}` : '';
+          
+          popup.classList.remove('hidden');
+          
+          // 알림음 재생
+          playNotificationSound();
+      }
+
+      // 알림 팝업 숨기기
+      function hideNotificationPopup() {
+          document.getElementById('pickup-notification').classList.add('hidden');
+          currentNotification = null;
+      }
+
+      // 알림음 재생
+      function playNotificationSound() {
+          try {
+              const audio = new Audio("/notification.mp3");
+              audio.play().catch((e) => console.log("오디오 재생 실패:", e));
+          } catch (error) {
+              console.log("알림음 재생 중 오류:", error);
+          }
+      }
+
+      // 알림에서 바로 하원 처리
+      function processNotificationPickup() {
+          if (currentNotification) {
+              processPickup(currentNotification.id);
+              hideNotificationPopup();
+          }
+      }
+
+      // 학교 코드 검증
+      function validateSchoolCode() {
+          const schoolCode = document.getElementById('school-code').value;
+          const statusDiv = document.getElementById('school-code-status');
+          
+          if (!schoolCode) {
+              statusDiv.innerHTML = '';
+              return false;
+          }
+
+          const school = schools.find(s => s.code === schoolCode);
+          if (school) {
+              statusDiv.innerHTML = '<span class="text-green-600">✓ 유효한 학교 코드입니다: ' + school.name + '</span>';
+              return true;
+          } else {
+              statusDiv.innerHTML = '<span class="text-red-600">✗ 유효하지 않은 학교 코드입니다</span>';
+              return false;
+          }
+      }
+
+      // 학교 코드 입력 시 실시간 검증
+      document.addEventListener('DOMContentLoaded', function() {
+          const schoolCodeInput = document.getElementById('school-code');
+          if (schoolCodeInput) {
+              schoolCodeInput.addEventListener('input', validateSchoolCode);
+          }
+      });
+
+      // 학부모 로그인
+      function parentLogin(event) {
+          event.preventDefault();
+          const username = document.getElementById('parent-username-login').value;
+          const password = document.getElementById('parent-password').value;
+          
+          const user = users.find(u => u.username === username && u.type === 'parent');
+          if (user) {
+              currentUser = user;
+              sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+              loadParentDashboard();
+              showPage('parent-dashboard');
+          } else {
+              alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+          }
+      }
+
+      // 학부모 회원가입
+      function parentRegister(event) {
+          event.preventDefault();
+          
+          const schoolCode = document.getElementById('school-code').value;
+          const name = document.getElementById('parent-name').value;
+          const phone = document.getElementById('parent-phone').value;
+          const username = document.getElementById('parent-username').value;
+          const email = document.getElementById('parent-reg-email').value;
+          const password = document.getElementById('parent-reg-password').value;
+          const confirmPassword = document.getElementById('parent-confirm-password').value;
+          const childName = document.getElementById('child-name').value;
+          const childClass = document.getElementById('child-class').value;
+          const agreeTerms = document.getElementById('agree-terms').checked;
+
+          // 유효성 검사
+          if (password !== confirmPassword) {
+              alert('비밀번호가 일치하지 않습니다.');
+              return;
+          }
+
+          if (!agreeTerms) {
+              alert('이용약관에 동의해주세요.');
+              return;
+          }
+
+          if (!validateSchoolCode()) {
+              alert('유효한 학교 코드를 입력해주세요.');
+              return;
+          }
+
+          // 아이디 중복 확인
+          if (users.find(u => u.username === username)) {
+              alert('이미 사용 중인 아이디입니다.');
+              return;
+          }
+
+          // 이메일 중복 확인
+          if (users.find(u => u.email === email)) {
+              alert('이미 등록된 이메일입니다.');
+              return;
+          }
+
+          // 학교 정보 찾기
+          const school = schools.find(s => s.code === schoolCode);
+          if (!school) {
+              alert('유효하지 않은 학교 코드입니다.');
+              return;
+          }
+
+          // 새 사용자 생성
+          const newUser = {
+              id: Date.now().toString(),
+              type: 'parent',
+              username: username,
+              email: email,
+              password: password,
+              name: name,
+              phone: phone,
+              schoolCode: schoolCode,
+              schoolName: school.name,
+              schoolId: school.id,
+              children: [{
+                  id: Date.now().toString() + '_child',
+                  name: childName,
+                  class: childClass,
+                  defaultPickupTime: '15:00'
+              }],
+              createdAt: new Date().toISOString()
+          };
+
+          users.push(newUser);
+          localStorage.setItem('users', JSON.stringify(users));
+
+          alert('회원가입이 완료되었습니다!');
+          showPage('parent-login');
+      }
+
+      // 학교 계정 로그인
+      function schoolLogin(event) {
+          event.preventDefault();
+          const username = document.getElementById('school-username').value;
+          const password = document.getElementById('school-password').value;
+          
+          const user = users.find(u => u.username === username && u.type === 'school');
+          if (user) {
+              currentUser = user;
+              sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+              loadSchoolDashboard();
+              showPage('school-dashboard');
+          } else {
+              alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+          }
+      }
+
+      // 학교 계정 등록
+      function schoolRegister(event) {
+          event.preventDefault();
+          
+          const schoolName = document.getElementById('school-name').value;
+          const schoolCode = document.getElementById('school-reg-code').value;
+          const address = document.getElementById('school-address').value;
+          const phone = document.getElementById('school-phone').value;
+          const username = document.getElementById('school-reg-username').value;
+          const email = document.getElementById('school-email').value;
+          const password = document.getElementById('school-reg-password').value;
+          const confirmPassword = document.getElementById('school-confirm-password').value;
+
+          // 유효성 검사
+          if (password !== confirmPassword) {
+              alert('비밀번호가 일치하지 않습니다.');
+              return;
+          }
+
+          // 중복 확인
+          if (users.find(u => u.email === email)) {
+              alert('이미 등록된 이메일입니다.');
+              return;
+          }
+
+          if (users.find(u => u.username === username)) {
+              alert('이미 사용 중인 아이디입니다.');
+              return;
+          }
+
+          if (schools.find(s => s.code === schoolCode)) {
+              alert('이미 사용 중인 학교 코드입니다.');
+              return;
+          }
+
+          // 새 학교 사용자 생성
+          const newUser = {
+              id: Date.now().toString(),
+              type: 'school',
+              username: username,
+              email: email,
+              password: password,
+              schoolName: schoolName,
+              schoolCode: schoolCode,
+              address: address,
+              phone: phone,
+              createdAt: new Date().toISOString()
+          };
+
+          // 새 학교 정보 생성
+          const newSchool = {
+              id: newUser.id,
+              name: schoolName,
+              code: schoolCode
+          };
+
+          users.push(newUser);
+          schools.push(newSchool);
+          
+          localStorage.setItem('users', JSON.stringify(users));
+          localStorage.setItem('schools', JSON.stringify(schools));
+
+          alert('학교 계정 등록이 완료되었습니다!\n학교 코드: ' + schoolCode + '\n이 코드를 학부모들에게 제공하세요.');
+          showPage('school-login');
+      }
+
+      // 학부모 대시보드 로드
+      function loadParentDashboard() {
+          if (!currentUser || currentUser.type !== 'parent') return;
+
+          // 환영 메시지
+          document.getElementById('parent-welcome').textContent = `${currentUser.name}님, ${currentUser.schoolName}`;
+
+          // 아이 선택 옵션 추가
+          const childSelect = document.getElementById('pickup-child');
+          childSelect.innerHTML = '<option value="">아이를 선택하세요</option>';
+          currentUser.children.forEach(child => {
+              const option = document.createElement('option');
+              option.value = child.id;
+              option.textContent = `${child.name} (${child.class})`;
+              childSelect.appendChild(option);
+          });
+
+          // 아이 정보 표시
+          const childInfo = document.getElementById('child-info');
+          childInfo.innerHTML = '';
+          currentUser.children.forEach(child => {
+              const childDiv = document.createElement('div');
+              childDiv.innerHTML = `
+                  <h4 class="font-medium">${child.name}</h4>
+                  <p class="text-sm text-muted-foreground">반: ${child.class}</p>
+                  <p class="text-sm text-muted-foreground">기본 하원 시간: ${child.defaultPickupTime || '15:00'}</p>
+              `;
+              childInfo.appendChild(childDiv);
+          });
+
+          // 학교 정보 표시
+          const schoolInfo = document.getElementById('school-info');
+          schoolInfo.innerHTML = `
+              <p class="text-sm"><strong>학교:</strong> ${currentUser.schoolName}</p>
+              <p class="text-sm"><strong>학교 코드:</strong> ${currentUser.schoolCode}</p>
+              <p class="text-sm"><strong>연락처:</strong> ${currentUser.phone}</p>
+              <p class="text-sm"><strong>이메일:</strong> ${currentUser.email}</p>
+          `;
+
+          // 하원 기록 로드
+          loadPickupHistory();
+      }
+
+      // 학교 대시보드 로드
+      function loadSchoolDashboard() {
+          if (!currentUser || currentUser.type !== 'school') return;
+          
+          // 환영 메시지
+          document.getElementById('school-welcome').textContent = currentUser.schoolName;
+
+          // 학생 목록 로드
+          loadStudentList();
+          
+          // 하원 요청 로드
+          loadPickupRequests();
+          
+          // 카운트 업데이트
+          updateCounts();
+
+          // 실시간 업데이트 시작
+          startRealTimeUpdates();
+      }
+
+      // 학부모 관리 페이지 로드
+      function loadParentsPage() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const schoolParents = users.filter(user => 
+              user.type === 'parent' && user.schoolId === currentUser.id
+          );
+
+          // 통계 업데이트
+          document.getElementById('total-parents').textContent = schoolParents.length + '명';
+          
+          const totalStudents = schoolParents.reduce((total, parent) => 
+              total + parent.children.length, 0
+          );
+          document.getElementById('total-students').textContent = totalStudents + '명';
+
+          // 반별 분포
+          const classDistribution = {};
+          schoolParents.forEach(parent => {
+              parent.children.forEach(child => {
+                  classDistribution[child.class] = (classDistribution[child.class] || 0) + 1;
+              });
+          });
+
+          const distributionDiv = document.getElementById('class-distribution');
+          distributionDiv.innerHTML = '';
+          ['돌봄1반', '돌봄2반', '돌봄3반'].forEach(className => {
+              const count = classDistribution[className] || 0;
+              const div = document.createElement('div');
+              div.className = 'flex justify-between';
+              div.innerHTML = `
+                  <span>${className}:</span>
+                  <span class="font-medium">${count}명</span>
+              `;
+              distributionDiv.appendChild(div);
+          });
+
+          // 학부모 목록 로드
+          loadParentsTable(schoolParents);
+      }
+
+      // 학부모 테이블 로드
+      function loadParentsTable(parents) {
+          const tableBody = document.getElementById('parents-table');
+          
+          if (parents.length === 0) {
+              tableBody.innerHTML = `
+                  <tr>
+                      <td colspan="6" class="py-8 text-center text-muted-foreground">
+                          등록된 학부모가 없습니다.
+                      </td>
+                  </tr>
+              `;
+              return;
+          }
+
+          tableBody.innerHTML = '';
+          parents.forEach(parent => {
+              const row = document.createElement('tr');
+              row.className = 'border-b parent-row';
+              row.innerHTML = `
+                  <td class="py-2 font-medium">${parent.name}</td>
+                  <td class="py-2">${parent.phone}</td>
+                  <td class="py-2">${parent.email}</td>
+                  <td class="py-2">
+                      <div class="space-y-1">
+                          ${parent.children.map(child => 
+                              `<div class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs inline-block mr-1">
+                                  ${child.name} (${child.class})
+                              </div>`
+                          ).join('')}
+                      </div>
+                  </td>
+                  <td class="py-2">${new Date(parent.createdAt).toLocaleDateString('ko-KR')}</td>
+                  <td class="py-2 text-right">
+                      <button onclick="showParentDetail('${parent.id}')" class="border border-gray-300 px-3 py-1 rounded text-sm hover:bg-gray-50">
+                          상세보기
+                      </button>
+                  </td>
+              `;
+              tableBody.appendChild(row);
+          });
+      }
+
+      // 학부모 검색
+      function searchParents() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const searchTerm = document.getElementById('parent-search').value.toLowerCase();
+          const allParents = users.filter(user => 
+              user.type === 'parent' && user.schoolId === currentUser.id
+          );
+
+          if (searchTerm.trim() === '') {
+              loadParentsTable(allParents);
+              return;
+          }
+
+          const filteredParents = allParents.filter(parent => 
+              parent.name.toLowerCase().includes(searchTerm) ||
+              parent.email.toLowerCase().includes(searchTerm) ||
+              parent.phone.includes(searchTerm) ||
+              parent.children.some(child => 
+                  child.name.toLowerCase().includes(searchTerm) ||
+                  child.class.toLowerCase().includes(searchTerm)
+              )
+          );
+
+          loadParentsTable(filteredParents);
+      }
+
+      // 학부모 상세 정보 표시
+      function showParentDetail(parentId) {
+          const parent = users.find(u => u.id === parentId);
+          if (!parent) return;
+
+          const modal = document.getElementById('parent-detail-modal');
+          const content = document.getElementById('parent-detail-content');
+
+          // 최근 하원 요청 기록
+          const recentRequests = pickupRequests
+              .filter(req => req.parentId === parentId)
+              .slice(-3);
+
+          content.innerHTML = `
+              <!-- 학부모 기본 정보 -->
+              <div class="grid gap-4 md:grid-cols-2">
+                  <div class="border rounded-lg p-4">
+                      <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                          👤 학부모 정보
+                      </h3>
+                      <div class="space-y-3">
+                          <div class="flex items-center gap-2">
+                              <span class="font-medium">이름:</span>
+                              <span>${parent.name}</span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                              📞 <span>${parent.phone}</span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                              📧 <span>${parent.email}</span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                              <span class="font-medium">가입일:</span>
+                              <span>${new Date(parent.createdAt).toLocaleDateString('ko-KR')}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="border rounded-lg p-4">
+                      <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                          👶 아이 정보
+                      </h3>
+                      <div class="space-y-3">
+                          ${parent.children.map(child => `
+                              <div class="p-3 border rounded-lg">
+                                  <div class="flex items-center gap-2 mb-2">
+                                      🎓 <span class="font-medium">${child.name}</span>
+                                  </div>
+                                  <div class="text-sm text-muted-foreground space-y-1">
+                                      <div>반: ${child.class}</div>
+                                      <div>기본 하원 시간: ${child.defaultPickupTime || '15:00'}</div>
+                                  </div>
+                              </div>
+                          `).join('')}
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 최근 하원 요청 기록 -->
+              <div class="border rounded-lg p-4">
+                  <h3 class="text-lg font-bold mb-3">최근 하원 요청 기록</h3>
+                  ${recentRequests.length === 0 ? 
+                      '<div class="text-center text-muted-foreground py-4">최근 하원 요청 기록이 없습니다.</div>' :
+                      `<div class="space-y-3">
+                          ${recentRequests.map(request => `
+                              <div class="flex items-center justify-between p-3 border rounded-lg">
+                                  <div>
+                                      <div class="font-medium">${request.childName}</div>
+                                      <div class="text-sm text-muted-foreground">
+                                          요청: ${request.requestTime}
+                                      </div>
+                                      ${request.note ? `<div class="text-sm text-muted-foreground">메모: ${request.note}</div>` : ''}
+                                  </div>
+                                  <span class="px-2 py-1 rounded text-xs ${
+                                      request.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                      request.status === 'acknowledged' ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-red-100 text-red-800'
+                                  }">
+                                      ${request.status === 'completed' ? '완료' :
+                                        request.status === 'acknowledged' ? '확인됨' : '대기중'}
+                                  </span>
+                              </div>
+                          `).join('')}
+                      </div>`
+                  }
+              </div>
+          `;
+
+          modal.classList.remove('hidden');
+      }
+
+      // 학부모 상세 모달 닫기
+      function closeParentModal() {
+          document.getElementById('parent-detail-modal').classList.add('hidden');
+      }
+
+      // 학생 목록 로드 (등록된 학부모의 아이들)
+      function loadStudentList() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const schoolStudents = [];
+          users.forEach(user => {
+              if (user.type === 'parent' && user.schoolId === currentUser.id) {
+                  user.children.forEach(child => {
+                      schoolStudents.push({
+                          id: child.id,
+                          name: child.name,
+                          class: child.class,
+                          status: 'present',
+                          parentName: user.name,
+                          parentPhone: user.phone,
+                          parentId: user.id
+                      });
+                  });
+              }
+          });
+
+          const tableBody = document.getElementById('students-table');
+          if (schoolStudents.length === 0) {
+              tableBody.innerHTML = `
+                  <tr>
+                      <td colspan="6" class="py-8 text-center text-muted-foreground">
+                          등록된 학생이 없습니다.<br>
+                          학부모가 계정을 등록하면 학생 목록이 표시됩니다.
+                      </td>
+                  </tr>
+              `;
+          } else {
+              tableBody.innerHTML = '';
+              schoolStudents.forEach(student => {
+                  const row = document.createElement('tr');
+                  row.className = 'border-b student-row';
+                  row.setAttribute('data-class', student.class);
+                  row.innerHTML = `
+                      <td class="py-2 font-medium">${student.name}</td>
+                      <td class="py-2">${student.class}</td>
+                      <td class="py-2"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">등원 중</span></td>
+                      <td class="py-2">${student.parentName}</td>
+                      <td class="py-2">${student.parentPhone}</td>
+                      <td class="py-2 text-right">
+                          <button onclick="pickupStudent(this, '${student.id}')" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-600">하원 처리</button>
+                      </td>
+                  `;
+                  tableBody.appendChild(row);
+              });
+          }
+      }
+
+      // 하원 요청 로드
+      function loadPickupRequests() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          const schoolRequests = pickupRequests.filter(req => {
+              const parentUser = users.find(u => u.id === req.parentId);
+              return parentUser && parentUser.schoolId === currentUser.id;
+          });
+
+          const requestsContainer = document.getElementById('pickup-requests');
+          const notificationCount = document.getElementById('notification-count');
+          const notificationBadge = document.getElementById('notification-badge');
+
+          if (schoolRequests.length === 0) {
+              requestsContainer.innerHTML = `
+                  <div class="py-8 text-center text-muted-foreground">
+                      접수된 하원 요청이 없습니다.
+                  </div>
+              `;
+              notificationCount.textContent = '0';
+              notificationBadge.classList.add('hidden');
+          } else {
+              requestsContainer.innerHTML = '';
+              let pendingCount = 0;
+
+              schoolRequests.forEach(request => {
+                  if (request.status === 'pending') pendingCount++;
+
+                  const requestDiv = document.createElement('div');
+                  requestDiv.className = `border rounded-lg p-4 mb-4 ${
+                      request.status === 'pending' ? 'border-red-200 bg-red-50' : 
+                      request.status === 'acknowledged' ? 'border-yellow-200 bg-yellow-50' : 
+                      'border-gray-200'
+                  }`;
+                  requestDiv.innerHTML = `
+                      <div class="flex justify-between items-start">
+                          <div>
+                              <h4 class="font-medium">
+                                  ${request.childName} (${request.childClass})
+                                  ${request.status === 'pending' ? '<span class="ml-2 bg-red-500 text-white px-2 py-1 rounded text-xs">새 요청</span>' : ''}
+                                  ${request.status === 'acknowledged' ? '<span class="ml-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs">확인됨</span>' : ''}
+                              </h4>
+                              <p class="text-sm text-muted-foreground">요청 시간: ${request.requestTime}</p>
+                              <p class="text-sm text-muted-foreground">요청자: ${request.parentName}</p>
+                              ${request.note ? `<p class="mt-2 text-sm">메모: ${request.note}</p>` : ''}
+                          </div>
+                          <div class="flex space-x-2">
+                              ${request.status === 'pending' ? `<button onclick="acknowledgeRequest('${request.id}')" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-600">확인</button>` : ''}
+                              ${request.status !== 'completed' ? `<button onclick="processPickup('${request.id}')" class="border border-gray-300 px-3 py-1 rounded text-sm hover:bg-gray-50">하원 처리</button>` : ''}
+                          </div>
+                      </div>
+                  `;
+                  requestsContainer.appendChild(requestDiv);
+              });
+
+              notificationCount.textContent = pendingCount.toString();
+              notificationBadge.textContent = pendingCount.toString();
+              if (pendingCount > 0) {
+                  notificationBadge.classList.remove('hidden');
+              } else {
+                  notificationBadge.classList.add('hidden');
+              }
+          }
+      }
+
+      // 하원 기록 로드
+      function loadPickupHistory() {
+          if (!currentUser || currentUser.type !== 'parent') return;
+
+          const userRequests = pickupRequests.filter(req => req.parentId === currentUser.id);
+          const historyContainer = document.getElementById('pickup-history');
+
+          if (userRequests.length === 0) {
+              historyContainer.innerHTML = `
+                  <div class="text-center text-muted-foreground py-4">
+                      아직 하원 기록이 없습니다.
+                  </div>
+              `;
+          } else {
+              historyContainer.innerHTML = '';
+              userRequests.slice(-5).reverse().forEach(request => {
+                  const historyDiv = document.createElement('div');
+                  historyDiv.className = 'flex items-start space-x-4';
+                  historyDiv.innerHTML = `
+                      <div class="bg-primary/10 p-2 rounded-full">
+                          <span class="text-primary">🕐</span>
+                      </div>
+                      <div>
+                          <p class="font-medium">${request.childName} - ${new Date().toLocaleDateString('ko-KR')}</p>
+                          <p class="text-sm text-muted-foreground">요청 시간: ${request.requestTime}</p>
+                          <p class="text-sm ${request.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}">
+                              ${request.status === 'completed' ? '✓ 하원 완료' : '⏳ 처리 중'}
+                          </p>
+                      </div>
+                  `;
+                  historyContainer.appendChild(historyDiv);
+              });
+          }
+      }
+
+      // 실시간 업데이트 시작
+      function startRealTimeUpdates() {
+          if (!currentUser || currentUser.type !== 'school') return;
+
+          // 기존 인터벌 정리
+          if (notificationInterval) {
+              clearInterval(notificationInterval);
+          }
+
+          notificationInterval = setInterval(() => {
+              loadPickupRequests();
+              updateCounts();
+              checkForNewNotifications();
+          }, 2000); // 2초마다 업데이트
+
+          // localStorage 변경 감지
+          window.addEventListener('storage', handleStorageChange);
+      }
+
+      // 하원 요청 제출 (단순화된 버전)
+      function submitPickupRequest(event) {
+          event.preventDefault();
+          
+          if (!currentUser || currentUser.type !== 'parent') return;
+
+          const childId = document.getElementById('pickup-child').value;
+          const note = document.getElementById('pickup-note').value;
+
+          if (!childId) {
+              alert('아이를 선택해주세요.');
+              return;
+          }
+
+          const child = currentUser.children.find(c => c.id === childId);
+          if (!child) {
+              alert('선택된 아이 정보를 찾을 수 없습니다.');
+              return;
+          }
+
+          // 하원 요청 생성 (단순화)
+          const request = {
+              id: Date.now().toString(),
+              childId: childId,
+              childName: child.name,
+              childClass: child.class,
+              parentId: currentUser.id,
+              parentName: currentUser.name,
+              parentPhone: currentUser.phone,
+              schoolCode: currentUser.schoolCode,
+              pickupTime: '즉시',
+              requestTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              note: note,
+              status: 'pending'
+          };
+
+          pickupRequests.push(request);
+          localStorage.setItem('pickupRequests', JSON.stringify(pickupRequests));
+
+          // 성공 메시지 표시
+          document.getElementById('pickup-form').classList.add('hidden');
+          document.getElementById('pickup-success').classList.remove('hidden');
+          
+          setTimeout(() => {
+              document.getElementById('pickup-form').classList.remove('hidden');
+              document.getElementById('pickup-success').classList.add('hidden');
+              document.getElementById('pickup-form').reset();
+              loadPickupHistory(); // 기록 새로고침
+          }, 3000);
+      }
+
+      // 학교 대시보드 탭 전환
+      function showTab(tabName) {
+          document.getElementById('students-tab').className = 'px-4 py-2 text-gray-500 hover:text-gray-700';
+          document.getElementById('notifications-tab').className = 'px-4 py-2 text-gray-500 hover:text-gray-700';
+          document.getElementById(tabName + '-tab').className = 'px-4 py-2 border-b-2 border-primary text-primary font-medium';
+
+          document.getElementById('students-content').classList.add('hidden');
+          document.getElementById('notifications-content').classList.add('hidden');
+          document.getElementById(tabName + '-content').classList.remove('hidden');
+      }
+
+      // 학생 필터링
+      function filterStudents(className) {
+          const rows = document.querySelectorAll('.student-row');
+          const buttons = document.querySelectorAll('[id^="filter-"]');
+          
+          buttons.forEach(btn => {
+              btn.className = 'px-3 py-1 border rounded text-sm';
+          });
+          
+          if (className === 'all') {
+              document.getElementById('filter-all').className = 'px-3 py-1 bg-primary text-white rounded text-sm';
+          } else {
+              const buttonMap = {'돌봄1반': 'filter-1', '돌봄2반': 'filter-2', '돌봄3반': 'filter-3'};
+              const selectedButton = document.getElementById(buttonMap[className]);
+              if (selectedButton) {
+                  selectedButton.className = 'px-3 py-1 bg-primary text-white rounded text-sm';
+              }
+          }
+
+          rows.forEach(row => {
+              if (className === 'all' || row.dataset.class === className) {
+                  row.style.display = '';
+              } else {
+                  row.style.display = 'none';
+              }
+          });
+      }
+
+      // 학생 하원 처리
+      function pickupStudent(button, studentId) {
+          const row = button.closest('tr');
+          const statusCell = row.querySelector('td:nth-child(3)');
+          const actionCell = row.querySelector('td:nth-child(6)');
+          
+          statusCell.innerHTML = '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">하원 완료</span>';
+          actionCell.innerHTML = '<button disabled class="bg-gray-300 text-gray-500 px-3 py-1 rounded text-sm cursor-not-allowed">하원 완료</button>';
+          
+          // 관련 하원 요청 완료 처리
+          const relatedRequest = pickupRequests.find(req => req.childId === studentId && req.status !== 'completed');
+          if (relatedRequest) {
+              relatedRequest.status = 'completed';
+              localStorage.setItem('pickupRequests', JSON.stringify(pickupRequests));
+          }
+          
+          updateCounts();
+          hideNotificationPopup(); // 알림 숨기기
+      }
+
+      // 카운트 업데이트
+      function updateCounts() {
+          const rows = document.querySelectorAll('.student-row');
+          let present = 0, pending = 0, picked = 0;
+          
+          rows.forEach(row => {
+              const statusSpan = row.querySelector('td:nth-child(3) span');
+              if (statusSpan) {
+                  const status = statusSpan.textContent;
+                  if (status === '등원 중') present++;
+                  else if (status === '하원 대기') pending++;
+                  else if (status === '하원 완료') picked++;
+              }
+          });
+          
+          const presentCount = document.getElementById('present-count');
+          const pendingCountEl = document.getElementById('pending-count');
+          const pickedCount = document.getElementById('picked-count');
+          
+          if (presentCount) presentCount.textContent = present + '명';
+          if (pendingCountEl) pendingCountEl.textContent = pending + '명';
+          if (pickedCount) pickedCount.textContent = picked + '명';
+      }
+
+      // 요청 확인
+      function acknowledgeRequest(requestId) {
+          const request = pickupRequests.find(req => req.id === requestId);
+          if (request) {
+              request.status = 'acknowledged';
+              localStorage.setItem('pickupRequests', JSON.stringify(pickupRequests));
+              loadPickupRequests();
+          }
+      }
+
+      // 하원 처리
+      function processPickup(requestId) {
+          const request = pickupRequests.find(req => req.id === requestId);
+          if (request) {
+              request.status = 'completed';
+              localStorage.setItem('pickupRequests', JSON.stringify(pickupRequests));
+              
+              // 학생 목록에서도 상태 업데이트
+              const studentRows = document.querySelectorAll('.student-row');
+              studentRows.forEach(row => {
+                  const studentName = row.querySelector('td:nth-child(1)').textContent;
+                  if (studentName === request.childName) {
+                      const statusCell = row.querySelector('td:nth-child(3)');
+                      const actionCell = row.querySelector('td:nth-child(6)');
+                      statusCell.innerHTML = '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">하원 완료</span>';
+                      actionCell.innerHTML = '<button disabled class="bg-gray-300 text-gray-500 px-3 py-1 rounded text-sm cursor-not-allowed">하원 완료</button>';
+                  }
+              });
+              
+              loadPickupRequests();
+              updateCounts();
+              hideNotificationPopup(); // 알림 숨기기
+          }
+      }
+
+      // 알림 확인
+      function acknowledgeNotification() {
+          if (currentNotification) {
+              acknowledgeRequest(currentNotification.id);
+          }
+          hideNotificationPopup();
+      }
+
+      // 알림 닫기
+      function closeNotification() {
+          hideNotificationPopup();
+      }
+
+      // 로그아웃
+      function logout() {
+          currentUser = null;
+          sessionStorage.removeItem('currentUser');
+          
+          // 인터벌 정리
+          if (notificationInterval) {
+              clearInterval(notificationInterval);
+              notificationInterval = null;
+          }
+          
+          // 이벤트 리스너 제거
+          window.removeEventListener('storage', handleStorageChange);
+          
+          showPage('main-page');
+      }
+
+      // 페이지 로드 시 초기화
+      document.addEventListener('DOMContentLoaded', function() {
+          // 현재 사용자가 있으면 해당 대시보드로 이동
+          if (currentUser) {
+              if (currentUser.type === 'parent') {
+                  loadParentDashboard();
+                  showPage('parent-dashboard');
+              } else if (currentUser.type === 'school') {
+                  loadSchoolDashboard();
+                  showPage('school-dashboard');
+              }
+          }
+      });
+  </script>
+</body>
+</html>
